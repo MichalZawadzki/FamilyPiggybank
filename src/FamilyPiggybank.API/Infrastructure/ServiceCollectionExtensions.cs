@@ -24,6 +24,7 @@ namespace FamilyPiggybank.API.Infrastructure
             services
                 .AddIdentity<User, IdentityRole<Guid>>(options =>
                 {
+                    options.User.RequireUniqueEmail = true;
                     options.Password.RequiredLength = 6;
                     options.Password.RequireDigit = false;
                     options.Password.RequireLowercase = false;

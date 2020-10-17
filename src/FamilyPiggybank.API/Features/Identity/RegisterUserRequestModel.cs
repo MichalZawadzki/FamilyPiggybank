@@ -5,7 +5,7 @@ namespace FamilyPiggybank.API.Models.Identity
     public class RegisterUserRequestModel
     {
         [Required]
-        public string Username { get; set; }
+        public string FamilyName { get; set; }
 
         [Required]
         public string Email { get; set; }

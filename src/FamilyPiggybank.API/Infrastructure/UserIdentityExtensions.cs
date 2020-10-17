@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+﻿using FamilyPiggybank.API.Infrastructure.Envelope;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +21,10 @@ namespace FamilyPiggybank.API.Infrastructure
 
             return new Guid(userId);
         }
+
+        public static ICollection<Error> MapToMetaError(this IEnumerable<IdentityError> identityErrors) =>
+            identityErrors
+                .Select(identityError => new Error(identityError.Code, new[] { identityError.Description }))
+                .ToList();
     }
 }

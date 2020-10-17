@@ -1,16 +1,9 @@
-﻿using FamilyPiggybank.API.Controllers;
+﻿using FamilyPiggybank.API.Infrastructure;
 using FamilyPiggybank.API.Models;
 using FamilyPiggybank.API.Models.Identity;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FamilyPiggybank.API.Features.Identity
@@ -33,7 +26,7 @@ namespace FamilyPiggybank.API.Features.Identity
         {
             var user = new User
             {
-                UserName = model.Username,
+                UserName = model.FamilyName,
                 Email = model.Email
             };
 
@@ -41,16 +34,16 @@ namespace FamilyPiggybank.API.Features.Identity
 
             if (result.Succeeded)
             {
-                return StatusCode((int)HttpStatusCode.Created);
+                return Created();
             }
 
-            return BadRequest(result.Errors);
+            return BadRequest(result.Errors.MapToMetaError());
         }
 
         [Route(nameof(Login))]
-        public async Task<ActionResult<LoginResponseModel>> Login(LoginUserRequestModel model)
+        public async Task<IActionResult> Login(LoginUserRequestModel model)
         {
-            var user = await userManager.FindByNameAsync(model.Username);
+            var user = await userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 return Unauthorized();
@@ -62,11 +55,12 @@ namespace FamilyPiggybank.API.Features.Identity
                 return Unauthorized();
             }
 
-            return new LoginResponseModel
+            var result = new LoginResponseModel
             {
                 Token = identityService.GenerateJwtToken(user, appSettings.Secret)
             };
-        }
 
+            return Ok(result);
+        }
     }
 }
